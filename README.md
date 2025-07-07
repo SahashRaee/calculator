@@ -11,8 +11,6 @@ A professional calculator with advanced mathematical functions and calculation h
 - Responsive design
 - Keyboard support
 
-## Demo
-Visit: [Your Vercel URL here]
 
 ## Technologies
 - HTML5

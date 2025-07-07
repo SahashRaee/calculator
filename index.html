@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Calculator Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .display {
+            background: #1a1a1a;
+            color: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .expression {
+            font-size: 16px;
+            color: #888;
+            min-height: 20px;
+            word-wrap: break-word;
+        }
+
+        .result {
+            font-size: 36px;
+            font-weight: 300;
+            text-align: right;
+            margin-top: 10px;
+            word-wrap: break-word;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            height: 60px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-number {
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .btn-operator {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-function {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            font-size: 14px;
+        }
+
+        .btn-clear {
+            background: linear-gradient(135deg, #ff9ff3, #f368e0);
+            color: white;
+        }
+
+        .btn-equals {
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+            color: white;
+            grid-column: span 2;
+        }
+
+        .btn-zero {
+            grid-column: span 2;
+        }
+
+        .history-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .history-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .clear-history {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .clear-history:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .history-item:hover {
+            background: #e9ecef;
+            border-left-color: #667eea;
+            transform: translateX(4px);
+        }
+
+        .history-expression {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .history-result {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .mode-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .scientific-buttons {
+            display: none;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .scientific-buttons.active {
+            display: grid;
+        }
+
+        .scientific-buttons button {
+            height: 45px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .buttons {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .btn-equals {
+                grid-column: span 2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="calculator">
+            <div class="mode-toggle">
+                <button class="mode-btn active" onclick="toggleMode('basic')">Basic</button>
+                <button class="mode-btn" onclick="toggleMode('scientific')">Scientific</button>
+            </div>
+            
+            <div class="display">
+                <div class="expression" id="expression"></div>
+                <div class="result" id="result">0</div>
+            </div>
+            
+            <div class="scientific-buttons" id="scientificButtons">
+                <button class="btn-function" onclick="addFunction('sin(')">sin</button>
+                <button class="btn-function" onclick="addFunction('cos(')">cos</button>
+                <button class="btn-function" onclick="addFunction('tan(')">tan</button>
+                <button class="btn-function" onclick="addFunction('log(')">log</button>
+                <button class="btn-function" onclick="addFunction('ln(')">ln</button>
+                <button class="btn-function" onclick="addFunction('sqrt(')">√</button>
+                <button class="btn-function" onclick="addToDisplay('^')">x^y</button>
+                <button class="btn-function" onclick="addToDisplay('(')">(</button>
+                <button class="btn-function" onclick="addToDisplay(')')">)</button>
+                <button class="btn-function" onclick="addToDisplay('π')">π</button>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn-clear" onclick="clearAll()">AC</button>
+                <button class="btn-clear" onclick="clearEntry()">C</button>
+                <button class="btn-operator" onclick="deleteLast()">⌫</button>
+                <button class="btn-operator" onclick="addToDisplay('/')">/</button>
+                <button class="btn-operator" onclick="addToDisplay('*')">×</button>
+                
+                <button class="btn-number" onclick="addToDisplay('7')">7</button>
+                <button class="btn-number" onclick="addToDisplay('8')">8</button>
+                <button class="btn-number" onclick="addToDisplay('9')">9</button>
+                <button class="btn-operator" onclick="addToDisplay('-')">-</button>
+                <button class="btn-function" onclick="addToDisplay('%')">%</button>
+                
+                <button class="btn-number" onclick="addToDisplay('4')">4</button>
+                <button class="btn-number" onclick="addToDisplay('5')">5</button>
+                <button class="btn-number" onclick="addToDisplay('6')">6</button>
+                <button class="btn-operator" onclick="addToDisplay('+')">+</button>
+                <button class="btn-function" onclick="addToDisplay('!')" title="Factorial">n!</button>
+                
+                <button class="btn-number" onclick="addToDisplay('1')">1</button>
+                <button class="btn-number" onclick="addToDisplay('2')">2</button>
+                <button class="btn-number" onclick="addToDisplay('3')">3</button>
+                <button class="btn-equals" onclick="calculate()" rowspan="2">=</button>
+                
+                <button class="btn-number btn-zero" onclick="addToDisplay('0')">0</button>
+                <button class="btn-number" onclick="addToDisplay('.')">.</button>
+            </div>
+        </div>
+        
+        <div class="history-panel">
+            <div class="history-header">
+                <h3 class="history-title">History</h3>
+                <button class="clear-history" onclick="clearHistory()">Clear</button>
+            </div>
+            <div class="history-list" id="historyList">
+                <div style="text-align: center; color: #999; margin-top: 50px;">
+                    No calculations yet
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentExpression = '';
+        let lastResult = '';
+        let history = [];
+        let isScientific = false;
+
+        function toggleMode(mode) {
+            const basicBtn = document.querySelector('.mode-btn:first-child');
+            const scientificBtn = document.querySelector('.mode-btn:last-child');
+            const scientificButtons = document.getElementById('scientificButtons');
+            
+            if (mode === 'scientific') {
+                isScientific = true;
+                basicBtn.classList.remove('active');
+                scientificBtn.classList.add('active');
+                scientificButtons.classList.add('active');
+            } else {
+                isScientific = false;
+                basicBtn.classList.add('active');
+                scientificBtn.classList.remove('active');
+                scientificButtons.classList.remove('active');
+            }
+        }
+
+        function addToDisplay(value) {
+            if (value === '×') value = '*';
+            currentExpression += value;
+            updateDisplay();
+        }
+
+        function addFunction(func) {
+            currentExpression += func;
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('expression').textContent = currentExpression || '';
+            
+            // Try to evaluate and show preview
+            try {
+                if (currentExpression) {
+                    let preview = evaluateExpression(currentExpression);
+                    if (preview !== undefined && preview !== null && !isNaN(preview)) {
+                        document.getElementById('result').textContent = formatResult(preview);
+                    }
+                }
+            } catch (e) {
+                // Don't show preview if expression is incomplete
+            }
+        }
+
+        function evaluateExpression(expr) {
+            // Replace mathematical constants and functions
+            expr = expr.replace(/π/g, Math.PI.toString());
+            expr = expr.replace(/e/g, Math.E.toString());
+            
+            // Handle scientific functions
+            expr = expr.replace(/sin\(/g, 'Math.sin(');
+            expr = expr.replace(/cos\(/g, 'Math.cos(');
+            expr = expr.replace(/tan\(/g, 'Math.tan(');
+            expr = expr.replace(/log\(/g, 'Math.log10(');
+            expr = expr.replace(/ln\(/g, 'Math.log(');
+            expr = expr.replace(/sqrt\(/g, 'Math.sqrt(');
+            
+            // Handle power operator
+            expr = expr.replace(/\^/g, '**');
+            
+            // Handle factorial
+            expr = expr.replace(/(\d+)!/g, (match, num) => {
+                return factorial(parseInt(num)).toString();
+            });
+            
+            // Handle percentage
+            expr = expr.replace(/(\d+(?:\.\d+)?)%/g, (match, num) => {
+                return (parseFloat(num) / 100).toString();
+            });
+            
+            // Evaluate the expression
+            return Function('"use strict"; return (' + expr + ')')();
+        }
+
+        function factorial(n) {
+            if (n <= 1) return 1;
+            return n * factorial(n - 1);
+        }
+
+        function formatResult(result) {
+            if (typeof result === 'number') {
+                if (result === Infinity) return 'Infinity';
+                if (result === -Infinity) return '-Infinity';
+                if (isNaN(result)) return 'Error';
+                
+                // Format large numbers in scientific notation
+                if (Math.abs(result) >= 1e10 || (Math.abs(result) < 1e-6 && result !== 0)) {
+                    return result.toExponential(6);
+                }
+                
+                // Round to avoid floating point precision issues
+                return parseFloat(result.toFixed(10)).toString();
+            }
+            return result.toString();
+        }
+
+        function calculate() {
+            if (!currentExpression) return;
+            
+            try {
+                const result = evaluateExpression(currentExpression);
+                const formattedResult = formatResult(result);
+                
+                // Add to history
+                addToHistory(currentExpression, formattedResult);
+                
+                // Update display
+                document.getElementById('result').textContent = formattedResult;
+                lastResult = formattedResult;
+                currentExpression = '';
+                
+                // Clear expression after showing result
+                setTimeout(() => {
+                    document.getElementById('expression').textContent = '';
+                }, 100);
+                
+            } catch (error) {
+                document.getElementById('result').textContent = 'Error';
+                setTimeout(() => {
+                    document.getElementById('result').textContent = lastResult || '0';
+                }, 2000);
+            }
+        }
+
+        function addToHistory(expression, result) {
+            const historyItem = {
+                expression: expression,
+                result: result,
+                timestamp: new Date().toLocaleTimeString()
+            };
+            
+            history.unshift(historyItem);
+            
+            // Keep only last 20 calculations
+            if (history.length > 20) {
+                history = history.slice(0, 20);
+            }
+            
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<div style="text-align: center; color: #999; margin-top: 50px;">No calculations yet</div>';
+                return;
+            }
+            
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item" onclick="useHistoryItem('${item.expression}', '${item.result}')">
+                    <div class="history-expression">${item.expression}</div>
+                    <div class="history-result">= ${item.result}</div>
+                </div>
+            `).join('');
+        }
+
+        function useHistoryItem(expression, result) {
+            currentExpression = result;
+            updateDisplay();
+        }
+
+        function clearAll() {
+            currentExpression = '';
+            lastResult = '';
+            document.getElementById('expression').textContent = '';
+            document.getElementById('result').textContent = '0';
+        }
+
+        function clearEntry() {
+            currentExpression = '';
+            document.getElementById('expression').textContent = '';
+            document.getElementById('result').textContent = lastResult || '0';
+        }
+
+        function deleteLast() {
+            currentExpression = currentExpression.slice(0, -1);
+            updateDisplay();
+            
+            if (!currentExpression) {
+                document.getElementById('result').textContent = lastResult || '0';
+            }
+        }
+
+        function clearHistory() {
+            history = [];
+            updateHistoryDisplay();
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            e.preventDefault();
+            
+            const key = e.key;
+            
+            if (key >= '0' && key <= '9') {
+                addToDisplay(key);
+            } else if (key === '.') {
+                addToDisplay('.');
+            } else if (key === '+') {
+                addToDisplay('+');
+            } else if (key === '-') {
+                addToDisplay('-');
+            } else if (key === '*') {
+                addToDisplay('*');
+            } else if (key === '/') {
+                addToDisplay('/');
+            } else if (key === '%') {
+                addToDisplay('%');
+            } else if (key === '(' || key === ')') {
+                addToDisplay(key);
+            } else if (key === 'Enter' || key === '=') {
+                calculate();
+            } else if (key === 'Escape') {
+                clearAll();
+            } else if (key === 'Backspace') {
+                deleteLast();
+            }
+        });
+
+        // Initialize
+        updateDisplay();
+    </script>
+</body>
+</html>
